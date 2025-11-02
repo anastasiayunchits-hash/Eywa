@@ -14,14 +14,13 @@ B --> B4[☀️ Daily Check-In<br/>Lifestyle Factors: Alcohol, Caffeine, etc.]
 
 %% Explore Core Features
 C --> C1[🤖 AI Assistant Chat<br/>Onboarding & Emotional Mapping]
-C --> C2[🧠 3-Layer Framework<br/>Strategy → Emotion → Somatic]
-C --> C3[💡 Insights & Psychoeducation<br/>Scientific Explanations]
-C --> C4[🪷 Somatic exercises + Journaling Suggestions<br/>Linked to Current Topic]
+C1 --> C2[🧠 3-Layer Framework<br/>Strategy → Emotion → Somatic]
+C1--> C3[💡 Insights & Psychoeducation<br/>Scientific Explanations]
+C1 --> C4[🪷 Somatic exercises + Journaling Suggestions<br/>Linked to Current Topic]
 
 %% Practices Core Features
 D --> D1[🌿 Favourite Exercises]
-D --> D2[📚 Storytelling Cards<br/> & Healing Narratives]
-D --> D3[📖 Educational Content<br/>Trauma · Strategies · Emotional Intelligence]
-D --> D4[👤 Profile Access<br/>Settings · Privacy · Integrations]
+D --> D2[📚 Storytelling Cards<br/> & Healing Narratives<br/> &Educational Content]
+D --> D3[👤 Profile Access<br/>Settings · Privacy · Integrations]
 ```
 
