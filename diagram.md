@@ -1,26 +1,28 @@
-```mermaid 
+```mermaid
 flowchart TD
 
-%% Core Navigation Tabs
-A[🏠 My State Screen] --- B[💬 Explore Screen]
-B --- C[🌸 Practices Screen]
+%% App Structure Overview
+A[🧩 App Navigation] --> B[🏠 My State Screen]
+A --> C[💬 Explore Screen]
+A --> D[🌸 Practices Screen]
 
 %% My State Core Features
-A --> A1[🔮 Hologram: Body + Brain Pathways + ANS Balance]
-A --> A2[📊 Biomarker Cards: Sleep, Activity, Heart Rate, Vitals, Battery]
-A --> A3[🧬 Active Strategy Rewiring Carousel]
-A --> A4[☀️ Daily Check-In: Lifestyle Factors]
+B --> B1[🔮 Hologram Visualization<br/>Body + Brain Pathways + ANS]
+B --> B2[📊 Biomarkers Overview<br/>Sleep · Activity · HR · HRV · Battery]
+B --> B3[🧬 Active Strategy Rewiring Carousel]
+B --> B4[☀️ Daily Check-In<br/>Lifestyle Factors: Alcohol, Caffeine, etc.]
 
 %% Explore Core Features
-B --> B1[🤖 AI Assistant Chat: Personalized & Context-Aware]
-B --> B2[🧠 3-Layer Framework Guidance: Strategy → Emotion → Somatic]
-B --> B3[📚 Psychoeducation & Insights]
-B --> B4[🪷 Somatic & Journaling Suggestions]
+C --> C1[🤖 AI Assistant Chat<br/>Onboarding & Emotional Mapping]
+C --> C2[🧠 3-Layer Framework<br/>Strategy → Emotion → Somatic]
+C --> C3[💡 Insights & Psychoeducation<br/>Scientific Explanations]
+C --> C4[🪷 Somatic + Journaling Suggestions<br/>Linked to Current Topic]
 
 %% Practices Core Features
-C --> C1[🌿 Favourites & Completed Practices]
-C --> C2[🪞 Storytelling Cards: Emotional Themes & Learning]
-C --> C3[🧘 Guided Somatic Exercises with Audio]
-C --> C4[📖 Educational Content: Trauma, Coping, Emotional Intelligence]
-C --> C5[👤 Profile Access: Settings & Privacy]
+D --> D1[🌿 Favourite & Completed Practices]
+D --> D2[📚 Storytelling Cards<br/>Emotional Themes & Healing Narratives]
+D --> D3[🧘 Guided Somatic Exercises<br/>Audio via ElevenLabs]
+D --> D4[📖 Educational Content<br/>Trauma · Strategies · Emotional Intelligence]
+D --> D5[👤 Profile Access<br/>Settings · Privacy · Integrations]
 ```
+
