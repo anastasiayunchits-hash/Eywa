@@ -1,36 +1,26 @@
-
 ```mermaid
-%% === MAIN NAVIGATION ===
+flowchart TD
+
+%% Core Navigation Tabs
 A[🏠 My State Screen] --- B[💬 Explore Screen]
 B --- C[🌸 Practices Screen]
-%% === MY STATE CORE FEATURES ===
-subgraph A[My State]
-A1[🧍‍♂️ Hologram View\n(Body + Brain pathways)]
-A2[📊 Biomarkers\n(Sleep, Activity, HR, Vitals, ANS Balance)]
-A3[🔋 Recovery Battery\n(filled during sleep, drained by strain)]
-A4[🧠 Active Strategy Cards\n(Neural rewiring progress)]
-A5[📅 Daily Check-In\n(Log alcohol, caffeine, meds, etc.)]
-A1 --> A2 --> A3 --> A4 --> A5
-end
 
-%% === EXPLORE CORE FEATURES ===
-subgraph B[Explore]
-B1[🤖 AI Assistant\n(Chat + Context memory)]
-B2[🧩 3-Layer Framework\n(Strategy → Emotion → Somatic Manifestation)]
-B3[📚 Storytelling Card Selection\n(based on user's struggle)]
-B4[📔 Daily Journaling Integration]
-B5[🧘 Somatic Practice Suggestions\n(from Practices module)]
-B1 --> B2 --> B3 --> B4 --> B5
-end
+%% My State Core Features
+A --> A1[🔮 Hologram: Body + Brain Pathways + ANS Balance]
+A --> A2[📊 Biomarker Cards: Sleep, Activity, Heart Rate, Vitals, Battery]
+A --> A3[🧬 Active Strategy Rewiring Carousel]
+A --> A4[☀️ Daily Check-In: Lifestyle Factors]
 
-%% === PRACTICES CORE FEATURES ===
-subgraph C[Practices]
-C1[🌟 Favourites\n(User’s saved practices)]
-C2[✅ Completed Practices Today]
-C3[📖 Storytelling Cards\n(Emotional intelligence, trauma, strategies)]
-C4[🎓 Educational Library\n(Self-education topics)]
-C5[👤 Profile Access\n(Settings, privacy, integrations)]
-C1 --> C2 --> C3 --> C4 --> C5
-end
+%% Explore Core Features
+B --> B1[🤖 AI Assistant Chat: Personalized & Context-Aware]
+B --> B2[🧠 3-Layer Framework Guidance: Strategy → Emotion → Somatic]
+B --> B3[📚 Psychoeducation & Insights]
+B --> B4[🪷 Somatic & Journaling Suggestions]
+
+%% Practices Core Features
+C --> C1[🌿 Favourites & Completed Practices]
+C --> C2[🪞 Storytelling Cards: Emotional Themes & Learning]
+C --> C3[🧘 Guided Somatic Exercises with Audio]
+C --> C4[📖 Educational Content: Trauma, Coping, Emotional Intelligence]
+C --> C5[👤 Profile Access: Settings & Privacy]
 ```
-
