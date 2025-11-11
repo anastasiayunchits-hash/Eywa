@@ -1,0 +1,1036 @@
+<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+
+# *"Please regenerate both documents (battery-algorithm-spec.md) and (qa-quick-ref.md) with the following updates:
+
+Count 7 days for baseline using a two-tier approach
+Never display less than 5% (show 5% minimum even if all scores reach 0)
+Add artifact removal specifications
+Remove all HRV references from PART 9: BATTERY SPENDING IN REAL WORLD and any other sections (we don't have HRV data throughout the day)
+After updating, please export both documents as downloadable files (md format) so I can download them."**
+
+Of course. Here are the regenerated versions of `battery-algorithm-spec.md` and `qa-quick-ref.md` with all your requested updates. You can download both documents using the links provided.
+
+### `battery-algorithm-spec.md`
+
+```markdown
+# Nervous System Battery Algorithm Specification
+## Wearable-Based Recovery & Readiness Scoring for Mental Health
+
+---
+
+## Executive Summary
+
+This specification outlines a **dynamic, personalized algorithm** for calculating a "Nervous System Battery" score that reflects autonomic nervous system (ANS) recovery capacity and physiological readiness. The battery metaphor represents autonomic flexibility—the parasympathetic nervous system's capacity to mobilize resources and restore homeostasis throughout the day.
+
+The algorithm operates in **two distinct stages**: (1) **Baseline Calibration Phase** (days 1-7+), where personal reference values are established using a two-tier approach, and (2) **Dynamic Monitoring Phase**, where real-time battery scores are calculated with continuous baseline recalibration every 30-60 days to account for nervous system healing trajectories (e.g., recovery from trauma, PTSD, depression).
+
+**Minimum Display Rule:** Battery scores are never displayed below 5%, even if calculated scores reach 0%. This prevents demotivating users and maintains hope during severe depletion periods.
+
+---
+
+## PART 1: TECHNICAL FOUNDATION & SCIENTIFIC RATIONALE
+
+### 1.1 Metric Selection: RMSSD vs. SDNN
+
+**Recommendation: PRIMARY = RMSSD | SECONDARY = SDNN**
+
+**Rationale:**
+
+- **rMSSD (Root Mean Square of Successive Differences)**
+  - Measures **beat-to-beat parasympathetic activity** (vagal tone)
+  - More sensitive to **short-term daily recovery** (perfect for morning baseline)
+  - Less artifact-prone than frequency-domain metrics at brief recording intervals
+  - **Responsive to daily stressors** and lifestyle changes
+  - Strongly correlates with perception of recovery state
+  - **Best for consumer wearables** with nightly measurement periods (5-60 minutes)
+  - Standard in Oura, WHOOP, Elite HRV apps
+
+- **SDNN (Standard Deviation of NN intervals)**
+  - Captures **long-term ANS balance** (sympathetic + parasympathetic)
+  - Better for assessing **chronic stress resilience** and baseline health trends
+  - More stable across days but less reactive to acute changes
+  - Requires **longer recording periods** (ideal: 24 hours)
+  - Less practical for consumer devices measuring only overnight HRV
+
+**Implementation:**
+- **Primary metric:** rMSSD from nightly sleep (average of 5-minute samples throughout night)
+- **Secondary metric:** SDNN if available from 24-hour data or if device deteriorates HRV quality
+- **Weighting:** rMSSD = 70% of HRV component, SDNN = 30% (if available)
+
+### 1.2 Artifact Detection and Removal
+
+**Critical Requirement:** HRV measurements are highly sensitive to artifact contamination. A single ectopic beat can inflate rMSSD by 400%+, creating false signals of "good recovery" when data quality is poor.
+
+**Artifact Removal Specifications:**
+
+```
+
+Artifact_Detection_Rules:
+
+1. Beat-to-beat thresholds:
+    - Flag any RR interval >2000ms or <300ms as artifact
+    - Flag any beat-to-beat change >300ms as potential artifact
+    - Flag any physiologically impossible sequences (e.g., alternating 400ms/1200ms)
+2. Segment quality assessment:
+    - Calculate % of artifactual beats in each 5-minute recording segment
+    - If artifactual beats >0.9% in a segment: EXCLUDE entire segment
+    - Rationale: rMSSD shows 413% increase with single artifact; SDNN shows 54% increase
+3. Recording quality flags:
+    - If sustained artifact rate >1.4% across full night: FLAG as low-quality data
+    - Alert user: "Poor sensor contact detected. Clean device and ensure snug fit."
+    - Do NOT use that night's HRV data for baseline or battery calculation
+4. Post-processing filters:
+    - Apply automatic artifact correction (threshold-based method)
+    - Use Kubios-standard or equivalent HRV artifact detection algorithms
+    - Validate corrected data: if >5% of beats required correction, discard recording
+5. User notifications:
+    - If 3+ consecutive nights flagged for artifact: prompt device cleaning
+    - If pattern continues: suggest device replacement or alternative placement
+    - Show data quality indicator in app: "Today's HRV confidence: High/Medium/Low"
+```
+
+**Implementation Priority:** CRITICAL — Artifact removal must be implemented BEFORE any HRV scoring to prevent false positives and user confusion.
+
+---
+
+### 1.3 7-Day Rolling Average Implementation (Two-Tier Baseline)
+
+**Definition:** A continuous moving average that incorporates the past 7 consecutive calendar days, with **weighted recency bias** (past 2-5 days weighted 1.3-1.5x more than earlier days).
+
+**Two-Tier Baseline Approach:**
+
+**Tier A: Early Phase (Days 1-7)**
+- Use a **rolling, distribution-based baseline** with recency weighting
+- Compute provisional battery using 20th percentile (worst) and 80th percentile (best) from available data
+- Show confidence indicators: "Personalization in progress — your score improves as we learn your patterns"
+- Minimum 5 days of clean data required before showing any battery score
+
+**Tier B: Anchor Phase (Day 7+)**
+- Define 100% and 0% using median nightly rMSSD on user-confirmed best (5/5) and worst (1/5) mornings
+- Linear mapping: `HRV_mapped = clamp(5, 100, 100 × (rMSSD_today − worst_median) / (best_median − worst_median))`
+- Note: Floor is 5%, not 0%, to maintain user hope during severe depletion
+- Keep long-term baseline as sanity constraint to prevent runaway scaling
+
+**Handling Missing Extremes:**
+- If no 1-2 or 4-5 ratings yet, use **provisional anchors** from distributional percentiles
+- Bootstrap anchors: use upper/lower quartiles of rMSSD on available days as temporary proxies
+- Update continuously as genuine extreme labels arrive
+- Maintain usable battery score within first week while avoiding bias
+
+**Does it require 7 consecutive days without breaks?**
+- **Partially yes, but with intelligent interpolation:**
+  - If 1-2 days of data are missing: interpolate using adjacent day values
+  - If 3+ consecutive days missing: exclude that window and use prior 7-day baseline
+  - User can manually flag data gaps (e.g., "didn't wear device") to prevent algorithm confusion
+  - Once baseline is established (7+ days), short gaps don't reset the baseline calculation
+
+**Formula:**
+```
+
+HRV_7day_rolling[day_n] = (
+HRV[n-6] × 1.0 +
+HRV[n-5] × 1.1 +
+HRV[n-4] × 1.2 +
+HRV[n-3] × 1.3 +
+HRV[n-2] × 1.4 +
+HRV[n-1] × 1.5 +
+HRV[n] × 1.5
+) / (1.0 + 1.1 + 1.2 + 1.3 + 1.4 + 1.5 + 1.5)
+
+```
+
+**Updates:** Recalculate every morning after HRV measurement
+
+---
+
+## PART 2: TWO-STAGE ALGORITHM ARCHITECTURE
+
+### Stage 1: BASELINE CALIBRATION PHASE (Days 1-7, Extended to Day 30 for Refinement)
+
+**Objective:** Establish personal physiological reference points across best-case (well-recovered) and worst-case (depleted) states using a two-tier approach.
+
+#### 2.1 Data Collection Requirements
+
+**Required:** Minimum **5 days** of clean data before any battery score is displayed
+
+**Optimal for accurate baseline:** **7 consecutive days** (1 week)
+- Captures day-to-day variability
+- Accounts for weekly patterns (weekday vs. weekend effects)
+- Sufficient for initial two-tier calibration
+
+**Extended calibration window:** Collect for **28-30 days** if possible, as:
+- Sleep patterns stabilize by week 3
+- Individual stress response patterns emerge
+- Circadian rhythm phase can be estimated more accurately
+- Anchor-based scaling becomes more reliable with more labeled extremes
+
+#### 2.2 Morning Self-Assessment Integration
+
+**User provides three morning assessments (screens 1-3, all on 1-5 scale):**
+
+1. **Sleep Quality** (subjective restoration)
+   - 1 = Restless, fragmented, unrefreshed
+   - 5 = Deep, nourishing, clear mind
+
+2. **Sleep Sufficiency** (vs. personal needs)
+   - 1 = Completely unrefreshed, heavy
+   - 5 = Energized and clear
+
+3. **Daily Readiness** (physical + emotional capacity)
+   - 1 = Unsteady, tense, heavy, unsettled
+   - 5 = Empowered, focused, open, ready
+
+**Average these three scores:** `SubjectiveReadiness = (Q1 + Q2 + Q3) / 3`
+- Range: 1.0–5.0
+
+**During baseline calibration:**
+- Map each day's **objective physiology** (HRV, HR, RHR, sleep metrics) to subjective readiness
+- Identify the **personal correlation coefficient** between objective metrics and subjective experience
+- Establish what "100% battery" and "5% battery" (minimum display) mean for this individual
+- Motivate daily labels: "Your daily answers accelerate personalization and improve score accuracy"
+
+#### 2.3 Baseline Values to Track
+
+Collect all available data from Thryve API:
+
+| Metric | Source | Description |
+|--------|--------|-------------|
+| **Night HRV (rMSSD)** | Wearable | Mean of 5-min samples during sleep; units = ms |
+| **Resting HR** | Wearable | Lowest HR during sleep; units = bpm |
+| **Sleep Duration** | Wearable | Total sleep time; units = minutes |
+| **Sleep Efficiency** | Wearable | (Total Sleep Time / Time in Bed) × 100; units = % |
+| **Sleep Stages** | Wearable | Deep%, Light%, REM%, Awake% (if available) |
+| **Respiratory Rate** | Wearable | Breaths per minute (if available) |
+| **Skin Temperature Deviation**| Wearable | Deviation from personal baseline (if available) |
+| **Activity (Daily Steps)** | Wearable/Phone | Step count; units = steps |
+| **Activity Intensity** | Wearable | Moderate-vigorous activity minutes; units = minutes |
+| **Subjective Readiness** | App | User's 3-question assessment averaged; units = 1–5 |
+
+**Circadian Rhythm Phase (Optional but Valuable):**
+- Estimate from activity actigraphy + light exposure using published algorithms (Kronauer model or open-source CircaCP)
+- Identify if user's sleep is optimally aligned with their circadian phase
+- A "good" sleep-circadian phase angle is typically when sleep occurs 2-4 hours after dim light melatonin onset (DLMO)
+
+---
+
+### Stage 2: DYNAMIC MONITORING PHASE (Day 7+)
+
+Once baseline is established (minimum 7 days with two-tier approach), calculate **real-time Battery Score** as a weighted composite.
+
+---
+
+## PART 3: BATTERY SCORE ALGORITHM (STAGE 2)
+
+### 3.1 Component Scores (Each Calculated 5–100)
+
+The final battery score is a **weighted average of 6 independent component scores**, each normalized to a 5–100 scale based on the individual's baseline. **Note the 5% floor:** even if individual components calculate to 0%, they are displayed as minimum 5%.
+
+#### **Component 1: HRV Recovery Score (Weight: 25%)**
+
+**Formula:**
+```
+
+HRV_current = today's rMSSD (ms) [after artifact removal]
+HRV_baseline_mean = average rMSSD over past 60 days (or 7+ days if <60 days available)
+HRV_baseline_sd = standard deviation of rMSSD over past 60 days
+
+Z_score_HRV = (HRV_current - HRV_baseline_mean) / HRV_baseline_sd
+
+HRV_Score_raw = 50 + (Z_score_HRV × 15)
+HRV_Score = min(100, max(5, HRV_Score_raw))  // 5% minimum floor
+
+```
+
+**Interpretation:**
+- HRV at baseline mean = 50 points
+- HRV > baseline + 1 SD = 65 points
+- HRV > baseline + 2 SD = 80 points
+- HRV < baseline - 1.5 SD = 25 points (or minimum 5% if worse)
+
+**Rationale:** HRV is the single best marker of vagal tone and ANS flexibility. Deviations beyond ±2 SD indicate significant autonomic dysregulation requiring intervention.
+
+---
+
+#### **Component 2: Resting Heart Rate Recovery Score (Weight: 20%)**
+
+**Formula:**
+```
+
+RHR_current = tonight's resting heart rate (lowest during sleep, bpm)
+RHR_baseline_mean = average RHR over past 60 days
+RHR_baseline_sd = standard deviation of RHR over past 60 days
+
+Z_score_RHR = -(RHR_current - RHR_baseline_mean) / RHR_baseline_sd
+[Note: negative because LOWER RHR = BETTER recovery]
+
+RHR_Score_raw = 50 + (Z_score_RHR × 12)
+RHR_Score = min(100, max(5, RHR_Score_raw))  // 5% minimum floor
+
+```
+
+**Interpretation:**
+- RHR at baseline = 50 points
+- RHR > 5 bpm below baseline = 62 points (good recovery)
+- RHR > 10 bpm below baseline = 74 points (excellent recovery)
+- RHR > 10 bpm above baseline = 26 points (or minimum 5%)
+
+**Rationale:** Elevated RHR (>5-10 bpm above personal baseline) indicates sympathetic overactivity, inadequate parasympathetic rebound, or subclinical illness.
+
+---
+
+#### **Component 3: Sleep Quality & Efficiency Score (Weight: 20%)**
+
+**Composite of sleep metrics:**
+
+```
+
+SleepDuration_score:
+
+- Target: 7–9 hours (420–540 min)
+- If 420–540 min: 100 points
+- If 360–420 min or 540–600 min: 85 points
+- If <360 min or >600 min: max(5, 50) points  // 5% minimum
+
+SleepEfficiency_score:
+
+- Target: 85%+ (can extract from wearable)
+- If 85%+: 100 points
+- If 80–85%: 85 points
+- If 75–80%: 70 points
+- If <75%: max(5, 50) points  // 5% minimum
+
+SleepStages_score (if available):
+
+- Deep sleep + REM: 60%+ of total sleep = 100 points
+- Deep sleep + REM: 45–60% = 85 points
+- Deep sleep + REM: <45% = max(5, 60) points
+
+Sleep_Quality_Score = (
+SleepDuration_score × 0.35 +
+SleepEfficiency_score × 0.40 +
+SleepStages_score × 0.25
+)
+Sleep_Quality_Score = max(5, Sleep_Quality_Score)  // 5% minimum floor
+
+```
+
+**Special consideration - Sleep Penalty Logic:**
+- **If total sleep duration < 6 hours:** Apply 15-point penalty to final battery score
+- **If sleep efficiency < 70%:** Apply 10-point penalty
+- **After penalties applied:** Ensure final score ≥ 5%
+- **Rationale:** Prevents misleading "you're fine" messages when objectively sleep-deprived
+
+---
+
+#### **Component 4: Subjective Readiness Score (Weight: 15%)**
+
+**Formula:**
+```
+
+Subjective_Raw = (Q1_SleepQuality + Q2_SleepSufficiency + Q3_DailyReadiness) / 3
+Range: 1–5
+
+Subjective_Normalized_raw = ((Subjective_Raw - 1) / 4) × 100
+Subjective_Normalized = max(5, Subjective_Normalized_raw)  // 5% minimum
+
+```
+
+**Conflict Resolution:**
+- **If Subjective < Objective by 20+ points:** Weight subjective 70% / objective 30%
+- **If Subjective > Objective by 20+ points AND sleep was poor:** Weight objective 70% / subjective 30% + apply sleep penalty
+
+---
+
+#### **Component 5: Activity-Stress Load Score (Weight: 12%)**
+
+```
+
+Daily_Steps = today's total steps
+Intense_Activity_Minutes = moderate-vigorous exercise (min)
+
+Baseline_Steps = median daily steps over past 60 days (or 7+ days)
+Baseline_Intense_Min = median intense activity min over past 60 days
+
+Activity_Load = (
+(Daily_Steps / Baseline_Steps) × 40 +
+(Intense_Activity_Minutes / Baseline_Intense_Min) × 60
+)
+
+Activity_Stress_Score_raw = 100 - min(100, Activity_Load)
+Activity_Stress_Score = max(5, Activity_Stress_Score_raw)  // 5% minimum
+
+```
+
+**Context incorporation:**
+- **Planned workout** (logged): multiply drain by 0.7 (adaptive stress)
+- **Rest day** (logged + minimal activity): +5 point boost
+
+---
+
+#### **Component 6: Circadian Rhythm Alignment Score (Weight: 8%)**
+
+```
+
+Calculate sleep timing relative to estimated circadian phase:
+
+If phase angle within ±3 hours:
+Circadian_Score_raw = 90 + (3 - |phase_angle|) × 3
+
+If phase angle > ±4 hours:
+Circadian_Score_raw = 60 - (|phase_angle| - 4) × 5
+
+Circadian_Score = max(5, Circadian_Score_raw)  // 5% minimum floor
+
+```
+
+---
+
+### 3.2 BATTERY SCORE CALCULATION (Final Weighted Composite)
+
+```
+
+Battery_Score_raw = (
+HRV_Score × 0.25 +
+RHR_Score × 0.20 +
+Sleep_Quality_Score × 0.20 +
+Subjective_Readiness × 0.15 +
+Activity_Stress_Score × 0.12 +
+Circadian_Score × 0.08
+)
+
+Apply Sleep Penalty (if applicable):
+if Sleep_Duration < 6 hours:
+Battery_Score_raw -= 15
+if Sleep_Efficiency < 70%:
+Battery_Score_raw -= 10
+
+Final_Battery_Score = max(5, min(100, Battery_Score_raw))
+
+```
+
+**CRITICAL RULE: 5% Minimum Display**
+- Even if calculated score is 0%, 1%, 2%, 3%, or 4%, **always display minimum 5%**
+- Rationale: Prevents complete despair; maintains hope during severe depletion
+- Communicates: "You have minimal capacity, but you still have something"
+
+**Output format:**
+- **Score 5–100** (battery percentage)
+- **Color coding:**
+  - 80–100: Full battery 🟢 (Ready to engage)
+  - 60–79: Partial battery 🟡 (Functional but conserve energy)
+  - 40–59: Low battery 🟠 (Depleted, focus on rest)
+  - 5–39: Critical battery 🔴 (Severe dysregulation; clinical support may be needed)
+
+---
+
+## PART 4: BATTERY SPENDING THROUGHOUT THE DAY
+
+### 4.1 Daytime Strain Algorithm (Activity-Based Decrement)
+
+**Objective:** Model how battery depletes during waking hours based on stress, activity, and heart rate patterns.
+
+**IMPORTANT LIMITATION:** Consumer wearables do NOT reliably measure HRV throughout the day. Therefore, daytime battery spending is calculated ONLY from:
+1. **Heart rate elevation** (sympathetic activation)
+2. **Activity level** (steps, exercise minutes)
+3. **User-logged stress events**
+
+**We do NOT use daytime HRV in this calculation** because it is not available from most consumer devices.
+
+#### 4.2 Hourly Battery Drain Calculation
+
+```
+
+For each hour of waking time:
+
+HR_Elevation = HR_current - RHR_baseline
+HR_max = 220 - age [or use user's measured max if available]
+
+Stress_Zones (define based on % of max HR):
+
+- Zone 1 (Rest): <50% HR_max → Drain = 0–2% per hour
+- Zone 2 (Light): 50–60% HR_max → Drain = 2–5% per hour
+- Zone 3 (Moderate): 60–70% HR_max → Drain = 5–10% per hour
+- Zone 4 (Hard): 70–85% HR_max → Drain = 10–15% per hour
+- Zone 5 (Max): 85%+ HR_max → Drain = 15–20% per hour
+
+Hourly_Drain = Drain_Rate × (minutes_in_zone / 60)
+
+If step_count_hourly > baseline_hourly_steps:
+Activity_Multiplier = 1 + (excess_steps / baseline_hourly_steps) × 0.3
+Hourly_Drain *= Activity_Multiplier
+
+```
+
+**Note:** This calculation uses ONLY heart rate and activity, not HRV, because consumer devices don't provide reliable daytime HRV measurements.
+
+#### 4.3 Daily Battery Spending Model
+
+```
+
+Morning Battery (at wake) = today's calculated Battery_Score (5–100)
+
+Cumulative_Hourly_Drain = sum of Hourly_Drain for hours 1 to N
+
+Current_Battery = Morning_Battery - Cumulative_Hourly_Drain
+Current_Battery = max(5, Current_Battery)  // Never go below 5%
+
+```
+
+**Constraints:**
+- Battery display floor is 5% (even if calculated as 0%)
+- Updates every 15–30 minutes in app
+- User sees: "Current battery: 62% | Projected end-of-day: 35%"
+- If projection falls below 5%, show 5% with message: "Critical depletion"
+
+---
+
+### 4.4 Contextual Spending Rates (Scenario-Based)
+
+**All scenarios below use ONLY heart rate and activity data, NOT daytime HRV:**
+
+**Scenario 1: Planned Exercise/Training**
+- If user logs workout: apply **0.7x spending multiplier**
+- Battery drain during planned workout: lower than unplanned stress at same HR
+- Example: 30 min at HR Zone 4 during gym = 6% drain; same during work crisis = 9% drain
+
+**Scenario 2: Psychological Stress (User-Logged)**
+- User manually logs "high stress period"
+- Increase drain rate by **1.5x** for that hour
+- Use HR elevation + logged stress, NOT HRV (which isn't available during day)
+- Recommend: grounding exercise, somatic practice
+
+**Scenario 3: Intense Focus (Flow State)**
+- Moderate HR elevation with low physical movement
+- If user logs "focused work" and HR stable: treat as standard drain
+- Do NOT attempt to measure HRV during focus (unreliable from consumer devices)
+
+**Scenario 4: Recovery Practices (Meditation, Breathwork)**
+- User logs meditation/yoga/somatic exercise
+- If HR drops >10 bpm sustained during practice: **battery gains 2–5%**
+- Rationale: parasympathetic activation actively restores resources
+- Use HR drop as proxy for recovery, NOT daytime HRV measurement
+
+---
+
+## PART 5: DYNAMIC BASELINE RECALIBRATION
+
+### 5.1 Why Recalibration is Necessary
+
+The autonomic nervous system can **heal and recover** over time. Static baselines create false negative signals.
+
+### 5.2 Recalibration Schedule
+
+**Recommendation: Every 30–60 days**
+
+- Shorter (30 days) if active treatment or sustained improvement
+- Longer (60 days) if stable and not in intervention
+
+### 5.3 Recalibration Algorithm
+
+```
+
+Compare past 30-60 days to previous baseline:
+
+Percent_Change = (New_HRV_Baseline_Mean - Old_HRV_Baseline_Mean) / Old_HRV_Baseline_Mean
+
+If Percent_Change > +10%:
+// Improvement → update baseline
+HRV_Baseline = New_HRV_Baseline_Mean
+Notify: "Your nervous system capacity has improved! ⬆️"
+
+If Percent_Change between -10% and +10%:
+// Stable → no change
+
+If Percent_Change < -10%:
+// Deterioration → conservative recalibration
+HRV_Baseline = (Old_Baseline + New_Baseline) × 0.5
+Notify: "Your recovery has decreased. Check: stress, sleep, illness."
+
+```
+
+### 5.4 Preventing Maladaptive Recalibration
+
+**Safeguards:**
+1. **Illness detection:** If RHR >baseline+8 for 3+ days → exclude from recalibration
+2. **Acute stress:** User-logged major stressors → exclude 3-7 days
+3. **Medication changes:** Exclude 2-4 weeks post-new-medication
+
+---
+
+## PART 6: DATA COLLECTION & FREQUENCY RECOMMENDATIONS
+
+### 6.1 Morning Self-Assessment Frequency
+
+**Recommendation: Daily, immediately upon waking (within 30 min)**
+
+**Timing importance:**
+- Memory for sleep quality degrades throughout day
+- Morning optimal window before new stressors accumulate
+
+### 6.2 Sleep Efficiency Data Collection
+
+**Frequency:** Every night (automatic from wearable)
+**Update:** Recalculate rolling baseline weekly
+
+### 6.3 Can Sleep Efficiency Change Over Time?
+
+**YES** — Natural 5-10% day-to-day variation
+- Sustained >10% shift indicates underlying change
+- Monitor via 7-day rolling average
+- Recalibrate every 30-60 days
+
+---
+
+## PART 7: SOMATIC PRACTICES & BATTERY RESTORATION
+
+**Important Note:** Since consumer wearables don't provide daytime HRV, somatic practice detection relies on **heart rate changes only**.
+
+```
+
+Somatic_Practice_Bonus if:
+
+- User logs practice (meditation, yoga, breathwork)
+- HR drops >10 bpm sustained over 5+ minutes
+- Respiratory rate drops to 5-6 breaths/min (if available)
+
+Restoration_Bonus = (
+HR_drop × 0.5 +
+Duration_minutes × 0.1
+) / 10
+
+Maximum: +5% battery per 30-min session
+Always ensure final battery ≥ 5% floor
+
+```
+
+**Examples:**
+- Box Breathing (10 min, HR drop 8 bpm): ~+1.5% battery
+- Yoga (30 min, HR drop 20 bpm): ~+4% battery
+- Meditation (30 min, HR drop 15 bpm): ~+3.5% battery
+
+---
+
+## PART 8: BASELINE COLLECTION TIMELINE
+
+| Days of Data | Status | Battery Display |
+|---|---|---|
+| 1-4 days | Insufficient | Don't show score yet |
+| 5-7 days | Minimum (Tier A) | Show preliminary score (0.6 confidence), "Personalization in progress" |
+| 7-14 days | Standard (Tier B) | Show confident score (0.85 confidence), anchor-based if extremes available |
+| 14-30 days | Optimal | High-confidence (1.0), refined anchors |
+
+---
+
+## PART 9: BATTERY SPENDING IN REAL WORLD
+
+### Real-World Drain Examples (Using ONLY HR + Activity, NOT Daytime HRV)
+
+**Example 1: Office Worker**
+- RHR baseline: 62 bpm, age 32, HR_max ≈ 188 bpm
+- Morning battery: 75%
+
+**Hour-by-hour:**
+- 8-9 AM (commute): HR avg 80 bpm (~43% max = Zone 1), 800 steps → Drain 1.5%
+- 9-12 PM (desk work): HR avg 70 bpm (~37% max = Zone 1), 300 steps → Drain 1% per hour = 3%
+- 12-1 PM (lunch walk): HR avg 95 bpm (~51% max = Zone 2), 2000 steps → Drain 4%
+- 1-5 PM (meetings + work): HR avg 85 bpm (~45% max = Zone 1-2), 600 steps → Drain 2% per hour = 8%
+- 5-6 PM (gym, logged workout): HR avg 145 bpm (~77% max = Zone 4), 0.7x multiplier → Drain 8%
+- 6-10 PM (evening, dinner, TV): HR avg 68 bpm (~36% max = Zone 1) → Drain 1% per hour = 4%
+
+**End-of-day battery: 75% - 29.5% = 45.5% → Display as 46%** (still well above 5% floor)
+
+---
+
+**Example 2: High-Stress Day**
+- RHR baseline: 58 bpm, age 28, HR_max ≈ 192 bpm
+- Morning battery: 55% (started lower due to poor sleep)
+
+**Hour-by-hour:**
+- 8-10 AM (crisis at work, unplanned): HR avg 110 bpm (~60% max = Zone 3), 1.3x multiplier → Drain 13%
+- 10-12 PM (continued stress): HR avg 105 bpm (~55% max = Zone 2), 1.3x multiplier → Drain 10%
+- 12-1 PM (skipped lunch, anxious): HR avg 95 bpm (~49% max = Zone 2) → Drain 4%
+- 1-6 PM (meetings, emails): HR avg 88 bpm (~46% max = Zone 1-2) → Drain 12%
+- 6-7 PM (20-min meditation, logged): HR drops to 62 bpm → **Restore +3%**
+- 7-10 PM (collapse on couch): HR avg 65 bpm → Drain 3%
+
+**End-of-day: 55% - 42% + 3% = 16%** → Display as 16% 🔴 Critical battery
+
+**Recommendation shown:** "Critical depletion. Prioritize 8+ hours sleep tonight. Consider canceling tomorrow's non-essentials."
+
+---
+
+**Example 3: Severe Depletion (Calculated < 5%)**
+- Morning battery: 22% (already very low from sustained stress)
+- Extremely demanding day: total drain 25%
+- **Calculated end-of-day: 22% - 25% = -3%**
+- **Displayed battery: 5%** 🔴 (floor applied)
+
+**Message:** "You've reached minimum capacity. Your nervous system needs urgent rest. Seek support if this persists."
+
+---
+
+## PART 10: SPECIAL POPULATIONS
+
+### 10.1 Trauma/PTSD Recovery Tracking
+
+**Metrics (using only nightly HRV, not daytime):**
+- Track **HRV Coefficient of Variation** from nightly measurements
+- High CV = erratic; decreases during recovery
+- Calculate **Healing Progress Index:** week 1 vs. week 12 comparison
+- Show: "Your nervous system capacity has improved 8% this month"
+
+### 10.2 Menstrual Cycle Tracking
+
+**Hormonal variations affect nightly HRV and RHR:**
+- Follicular phase (days 1-14): HRV lower, RHR higher
+- Luteal phase (days 15-28): HRV stabilizes lower
+- Calculate separate baselines for each phase
+- Reduces false alarms for cycle-related dips
+
+### 10.3 Medication & Supplement Tracking
+
+```
+
+When new medication added:
+
+- Flag: exclude next 14-21 days from baseline recalibration
+- Monitor: if RHR +10 bpm, alert user
+- Track: "Before meds" vs. "4 weeks on meds" battery improvement
+
+```
+
+---
+
+## PART 11: THRYVE PLATFORM INTEGRATION
+
+### 11.1 Data Available from Thryve API
+
+| Biomarker | Use in Algorithm |
+|-----------|------------------|
+| Heart Rate (HR) | RHR Score + Daytime Drain |
+| HRV (rMSSD) nightly | HRV Recovery Score |
+| Sleep Duration | Sleep Quality Score |
+| Sleep Efficiency | Sleep Quality Score |
+| Sleep Stages | Sleep Quality Score sub-component |
+| Steps/Activity | Activity Stress Score + Hourly Drain |
+
+**NOT used (because unavailable from consumer devices):**
+- Daytime HRV measurements
+- Continuous HRV monitoring during activities
+
+### 11.2 Custom Calculations Needed
+
+| Calculation | Why Custom |
+|-------------|------------|
+| 7-day weighted rolling average | Two-tier baseline approach |
+| Artifact detection & removal | Critical for HRV accuracy |
+| Z-score normalization | Individual baseline comparison |
+| 5% minimum floor | User experience requirement |
+| Battery spending (HR-based) | Real-time drain without daytime HRV |
+
+---
+
+## PART 12: IMPLEMENTATION ROADMAP
+
+### Phase 1: MVP (Weeks 1-6)
+- [ ] Integrate Thryve API (HRV, HR, sleep)
+- [ ] **Implement artifact detection & removal (CRITICAL)**
+- [ ] Implement two-tier baseline (7 days minimum)
+- [ ] Build 3 primary components: HRV, RHR, Sleep Quality
+- [ ] **Implement 5% minimum display floor**
+- [ ] Morning self-assessment (3 questions)
+- [ ] Display: Battery % + color coding
+
+### Phase 2: Enhanced Baseline (Weeks 7-12)
+- [ ] Add Subjective Readiness Score
+- [ ] Implement 7-day weighted rolling average
+- [ ] Add Sleep Penalty Logic (with 5% floor)
+- [ ] Anchor-based scaling for Tier B
+- [ ] Baseline recalibration (30 days)
+
+### Phase 3: Activity & Stress (Weeks 13-18)
+- [ ] Integrate activity data (steps, exercise)
+- [ ] Build Activity-Stress Load Score
+- [ ] **Implement battery spending using ONLY HR + activity (no daytime HRV)**
+- [ ] Real-time battery updates (maintaining 5% floor)
+- [ ] Context: mark planned vs. unplanned activity
+
+### Phase 4: Advanced Features (Weeks 19-24)
+- [ ] Circadian Rhythm Alignment Score
+- [ ] Somatic practice detection (HR-based only)
+- [ ] Medication tracking
+- [ ] Weekly healing progress report
+
+### Phase 5: Personalization (Weeks 25+)
+- [ ] Menstrual cycle phase detection
+- [ ] Trauma recovery trajectory
+- [ ] AI assistant integration
+- [ ] Machine learning weight refinement
+
+---
+
+## PART 13: SCIENTIFIC REFERENCES
+
+### Key Studies:
+1. **HRV as autonomic marker:** Thayer & Sternberg (2006)
+2. **rMSSD vs. SDNN:** Laborde et al. (2017); Malik et al. (1996)
+3. **Artifact sensitivity:** Kubios HRV analysis methodology
+4. **Two-tier baseline:** Oura/WHOOP readiness systems
+5. **Recovery score:** WHOOP/Oura white papers
+6. **Sleep efficiency:** AASM standardized scoring
+7. **Trauma & ANS:** Porges Polyvagal Theory
+8. **Consumer wearable limitations:** HRV measurement best practices
+
+---
+
+## PART 14: ETHICAL CONSIDERATIONS & LIMITATIONS
+
+### 14.1 Known Limitations
+
+**CRITICAL LIMITATIONS:**
+1. **No daytime HRV:** Consumer wearables don't reliably measure HRV during day
+   - Solution: Use only nightly HRV for recovery scoring
+   - Use HR + activity for daytime battery spending
+   
+2. **Artifact sensitivity:** Single ectopic beat can inflate rMSSD by 400%
+   - Solution: Mandatory artifact detection & removal before any HRV scoring
+   
+3. **Individual variability:** HRV/RHR vary by genetics, age, sex
+   - Solution: Personalized baselines using two-tier approach
+   
+4. **5% floor trade-off:** May mask differences between severe states
+   - Solution: Internal tracking continues below 5%; only display is floored
+
+### 14.2 Ethical Guidelines
+
+1. **Transparency:** "This score is a personalized estimate, not medical diagnosis"
+2. **No pathologizing:** Use "currently depleted" not "broken"
+3. **Privacy:** Store biomarker data securely; local storage preferred
+4. **Trauma-informed:** Gentle, non-alarming messaging
+5. **Professional help:** If battery <30% for 2+ weeks: "Consider speaking with therapist"
+6. **Hope maintenance:** 5% minimum ensures users never see "0% — you have nothing left"
+
+---
+
+## SUMMARY: Implementation Checklist
+
+### Must-Have Features (Phase 1):
+- ✅ Two-tier baseline (7-day minimum)
+- ✅ Artifact detection & removal
+- ✅ 5% minimum display floor
+- ✅ Nightly HRV (rMSSD) scoring
+- ✅ Morning self-assessment (3 questions)
+- ✅ Sleep penalty logic
+- ✅ Basic battery display (5-100%)
+
+### Critical Technical Requirements:
+- ✅ Only use nightly HRV (no daytime HRV)
+- ✅ HR + activity only for daytime spending
+- ✅ Artifact removal BEFORE any scoring
+- ✅ Always display ≥5%, even if calculated <5%
+- ✅ Two-tier approach: distributional → anchor-based
+
+### User Experience Priorities:
+- ✅ "Personalization in progress" during Tier A
+- ✅ Daily self-assessment motivation messaging
+- ✅ Clear communication about 5% floor
+- ✅ Hope-maintaining language at critical battery
+- ✅ Professional support prompts when sustained low
+
+**Document Version:** 2.0  
+**Last Updated:** November 11, 2025  
+**Key Changes:** Two-tier 7-day baseline, 5% minimum floor, artifact removal specs, removed daytime HRV references
+```
+
+
+***
+
+### `qa-quick-ref.md`
+
+```markdown
+# Quick Reference: Q&A on Battery Algorithm Implementation (v2.0)
+
+## Q1: rMSSD vs SDNN - Which is Better?
+
+**Answer: Use rMSSD as PRIMARY metric**
+
+**Justification:**
+- rMSSD measures **beat-to-beat parasympathetic (vagal) tone**, which reflects the nervous system's capacity to recover and relax.
+- It is perfect for nightly measurements on consumer wearables and is highly responsive to **daily changes** in stress and recovery.
+- It is the standard metric in leading recovery apps (Oura, WHOOP, Elite HRV).
+
+**When to use SDNN (secondary):**
+- To capture **longer-term ANS balance** (e.g., 60-day trend).
+- As a sanity check; SDNN should trend upward if a person is healing.
+
+**CRITICAL: Artifact Sensitivity & Removal**
+- rMSSD is **extremely sensitive to bad data**. A single artifact (e.g., an ectopic beat) can inflate rMSSD by over 400%, creating false signals of "good recovery."
+- **Robust artifact removal is mandatory before any scoring.** The algorithm must:
+  1. Flag and filter physiologically impossible RR intervals.
+  2. Exclude any 5-minute recording segment where artifacts exceed 0.9% of beats.
+  3. Flag the entire night's data as low-quality if the sustained artifact rate is over 1.4% and exclude it from calculations.
+
+---
+
+## Q2: Seven-Day Rolling Average - Consecutive Days Required?
+
+**Answer: NOT strictly required, but strongly preferred**
+
+This 7-day weighted average forms the core of a **two-tier baseline**. For the first 7 days (Tier A), a provisional score is shown while the system learns your patterns. After day 7 (Tier B), the baseline becomes more robust, anchored by your user-confirmed "best" and "worst" days.
+
+**Practical handling of missing data:**
+- **0-1 days missing:** Interpolate using adjacent days.
+- **2 days missing:** Use a 5-day average for that gap.
+- **3+ days missing:** Skip that window; resume the rolling average once new data is available.
+
+**Formula for weighted rolling average (gives more weight to recent days):**
+```
+
+HRV_7day_rolling = (
+HRV[n-6]×1.0 + HRV[n-5]×1.1 + HRV[n-4]×1.2 + HRV[n-3]×1.3 +
+HRV[n-2]×1.4 + HRV[n-1]×1.5 + HRV[n]×1.5
+) / (1.0+1.1+1.2+1.3+1.4+1.5+1.5)
+
+```
+**Why this weighting matters:** Recent days have more influence, which mimics the body's adaptation to recent patterns, while older data provides stability.
+
+---
+
+## Q3: How do you score each component?
+
+**Answer: Use a 7-day weighted rolling average for key physiological components** like HRV and Resting HR to smooth out normal daily fluctuations and reveal the underlying trajectory. A single day's value is often unrepresentative and can cause user anxiety.
+
+| Component | Method | Why |
+|-----------|--------|-----|
+| HRV | 7-day weighted avg | Smooths daily noise (±15% is normal); reveals trend |
+| Resting HR | 7-day weighted avg | More stable signal than night-to-night variance |
+| Sleep Duration | 7-day unweighted avg | Fairly stable; judge against weekly goal |
+| Sleep Efficiency | 7-day unweighted avg | Same as duration; judge against weekly goal |
+| Subjective Readiness | 7-day unweighted avg | Captures mood and perception trajectory |
+
+---
+
+## Q4: Sleep Penalty Logic - How to Implement?
+
+**Answer: Apply a hard penalty for sleep deprivation, even if other metrics look good.** This prevents false security, as someone with decent HRV but only 5 hours of sleep is likely in a compensatory state (sympathetic overactivity masking fatigue).
+
+```
+
+Morning_Battery_Score = (weighted average of 6 components)
+
+Sleep_Penalty = 0
+
+// Severe sleep deprivation check
+if Night_Sleep_Duration < 5 hours:
+Sleep_Penalty = 20 points
+Message: "🔴 CRITICAL: <5 hours sleep. High accident/injury risk."
+
+// Sleep deprivation check
+if Night_Sleep_Duration < 6 hours:
+Sleep_Penalty = 15 points
+Message: "⚠️ <6 hours sleep triggers sleep debt. Minimize stress today."
+
+// Sleep fragmentation check
+if Sleep_Efficiency < 70%:
+Sleep_Penalty += 10 points
+Message: "⚠️ Fragmented sleep reduces restoration."
+
+// Ensure final score is never below 5%
+Final_Battery = max(5, min(100, (Battery_Score - Sleep_Penalty)))
+
+```
+
+---
+
+## Q5: Baseline Collection: How Many Days Before First Battery Score?
+
+**Answer:** Use the two-tier approach. Show a preliminary score after 5 days to engage the user, but communicate that personalization is in progress.
+
+| Days of Data | Status | Recommendation |
+|---|---|---|
+| 1-4 days | Insufficient | Don't show score. Message: "Collecting baseline data." |
+| 5-7 days | Minimum (Tier A) | Show preliminary score. Message: "Personalization in progress." |
+| 7-14 days | Standard (Tier B) | Show confident score, anchored by user-rated extremes if available. |
+| 14-30 days | Optimal | High-confidence score with refined anchors. |
+
+---
+
+## Q6: Battery Spending Algorithm: How is stress integrated?
+
+**Answer:** Battery depletes based on time spent in elevated heart rate zones and activity levels. **It does NOT use daytime HRV**, which is unreliable on consumer devices.
+
+**Hourly drain formula (simplified):**
+```
+
+For each hour:
+Strain_Zone_1 (<50% HR_max): 0-2% drain/hour
+Strain_Zone_2 (50-60%): 2-5% drain/hour
+... and so on for higher zones.
+
+// Activity adds to the drain
+if Daily_Steps > Baseline_Daily_Steps:
+Hourly_Drain *= Activity_Multiplier
+
+```
+
+**Contextual modulation:**
+- **Planned workout (user-logged):** 0.7x drain multiplier (adaptive stress).
+- **Psychological stress (user-logged):** 1.5x drain multiplier. If a user manually logs a "high stress period," the drain rate is increased to reflect the cost of mental strain. This is based on user context and HR elevation, **not daytime HRV**.
+
+---
+
+## Q7: Somatic Practices & Battery Restoration
+
+**Concept:** Guided practices (meditation, breathwork) can *actively restore* battery. Detection and reward are based on physiological changes that **do not include daytime HRV**.
+
+**Detection:**
+A bonus is applied if:
+- User logs a practice (e.g., meditation, yoga, breathwork).
+- Heart rate drops more than 10 bpm and is sustained for over 5 minutes.
+- Respiratory rate drops to 5-6 breaths/min (if available).
+
+**Restoration Formula:**
+The bonus is calculated based on the magnitude of the heart rate drop and the duration of the practice.
+```
+
+Restoration_Bonus = (HR_drop × 0.5 + Duration_minutes × 0.1) / 10
+
+// Maximum bonus of +5% per 30-min session.
+// The final battery score will always be clamped at a 5% minimum.
+
+```
+**Why include this:** It provides immediate, positive feedback and empowers users by showing that active recovery works.
+
+---
+
+## Summary Table: Key Implementation Parameters
+
+| Parameter | Value | Rationale |
+|-----------|-------|-----------|
+| **Primary HRV Metric** | rMSSD (nightly) | Best for consumer wearables & daily recovery. |
+| **Artifact Removal**| Mandatory | Critical for rMSSD accuracy; must be done before any scoring. |
+| **Rolling Average Window** | 7 days, weighted | Captures weekly patterns; recent-biased. |
+| **Baseline Period (Standard)**| 7-14 days | Sufficient for two-tier baseline calibration. |
+| **Recalibration Frequency**| Every 30-60 days | Detects healing trajectories (±10% change threshold). |
+| **Component Weighting** | HRV 25%, RHR 20%, Sleep 20%, Subjective 15%, Activity 12%, Circadian 8% | Based on leading wearable science. |
+| **Sleep Penalty** | -15 if <6 hrs; -10 if efficiency <70%. Final score clamped at 5% min. | Prevents misleading "ready" when sleep-deprived. |
+| **Battery Range** | 5-100% | Green ≥80, Yellow 60-79, Orange 40-59, Red <40 (down to 5% min). |
+| **Daytime Drain** | HR + Activity only | Daytime HRV is not used due to unreliability on consumer devices. |
+| **Somatic Practice Bonus** | +1 to +5% per session | Rewards active recovery, based on HR drop and duration. |
+
+---
+**Document Version:** 2.0  
+**For:** Quick Reference During Development  
+**Key Takeaway:** The algorithm uses nightly rMSSD, a 7-day two-tier baseline, robust artifact removal, and a 5% minimum display floor to provide accurate, trauma-informed recovery tracking without relying on daytime HRV.
+```
+
+<span style="display:none">[^1][^2][^3]</span>
+
+<div align="center">⁂</div>
+
+[^1]: qa-quick-ref.md
+
+[^2]: battery-algorithm-spec.md
+
+[^3]: Two-tier-baseline-logic.md
+
