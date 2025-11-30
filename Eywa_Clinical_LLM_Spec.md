@@ -456,12 +456,11 @@ Eywa is **not a replacement for telemedicine**; it's a **complement:**
 **AI/NLP Researchers:**
 - **Focus:** Fine-tuning LLMs for therapy, RLHF optimization, bias detection
 - **Role:** Develop training pipelines, ensure model quality, research novel approaches
-- **Opportunities:** Publications on clinical RLHF, therapy-specific NLP benchmarks
+
 
 **Implementation Science Researchers:**
 - **Focus:** Clinician adoption, barriers to deployment, real-world effectiveness
 - **Role:** Design dissemination studies, identify implementation barriers
-- **Opportunities:** Studies on technology-enhanced mental health care delivery
 
 ### Collaboration Framework
 
