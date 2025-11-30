@@ -26,9 +26,9 @@ Eywa develops a **clinical Large Language Model (LLM) platform for AI-assisted p
 #### Existing Therapeutic Chatbots: Demonstrated Limitations
 Recent research reveals critical limitations in current therapeutic AI:
 
-- **Cognitive Bias Handling:** General-purpose LLMs (GPT-4, Gemini) outperformed specialized therapeutic chatbots (Wysa, Youper) in recognizing and rectifying cognitive biases by 67%, indicating therapeutic bots lack necessary sophistication[1]
+- **Cognitive Bias Handling:** General-purpose LLMs (GPT-4, Gemini) outperformed specialized therapeutic chatbots (Wysa, Youper) in recognizing and rectifying cognitive biases by 67%, indicating therapeutic bots lack necessary sophistication.
 - **Affect Recognition Gaps:** Both specialized and general-purpose chatbots struggle with nuanced emotional understanding, providing responses that are overly generic or miss emotional depth
-- **Inadequate Long-term Efficacy:** Meta-analyses show significant short-term effects on depressive symptoms but *no statistically significant long-term effects*[2]
+- **Inadequate Long-term Efficacy:** Meta-analyses show significant short-term effects on depressive symptoms but *no statistically significant long-term effects*.
 - **Engagement vs. Clinical Improvement:** Current apps optimize for engagement and time-on-app rather than therapeutic outcome, creating potential for harm through false improvement perception
 - **Poor Representation in Training Data:** Psychotherapy transcripts are critically underrepresented in LLM training datasets, and privacy/ethical concerns make proper representation challenging
 
