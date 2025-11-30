@@ -4,8 +4,6 @@
 **Project Name:** Eywa Clinical Mental Health Platform  
 **Version:** 1.0  
 **Date:** November 30, 2025  
-**Target Audience:** Clinical Scientists, Psychotherapists, Regulatory Experts, Research Collaborators
-
 ---
 
 ## Executive Summary
@@ -17,7 +15,7 @@ Eywa develops a **clinical Large Language Model (LLM) platform for AI-assisted p
 **Primary Goals:**
 1. Train AI to provide long-term, personalized therapy across multiple disorders (autism, cPTSD, PTSD, depression, ADHD, and others) through direct observation of clinical expertise
 2. Democratize access to affordable, evidence-based psychotherapy without compromising safety or ethical standards
-3. Develop adaptive clinical competencies through human feedback rather than black-box training on patient data
+3. Develop adaptive clinical AI competencies through human feedback rather than black-box training on patient data
 
 ---
 
@@ -26,7 +24,7 @@ Eywa develops a **clinical Large Language Model (LLM) platform for AI-assisted p
 ### Current Landscape of AI in Mental Health
 
 #### Existing Therapeutic Chatbots: Demonstrated Limitations
-Recent research (JMIR Mental Health, 2025; Nature npj, 2024) reveals critical limitations in current therapeutic AI:
+Recent research reveals critical limitations in current therapeutic AI:
 
 - **Cognitive Bias Handling:** General-purpose LLMs (GPT-4, Gemini) outperformed specialized therapeutic chatbots (Wysa, Youper) in recognizing and rectifying cognitive biases by 67%, indicating therapeutic bots lack necessary sophistication[1]
 - **Affect Recognition Gaps:** Both specialized and general-purpose chatbots struggle with nuanced emotional understanding, providing responses that are overly generic or miss emotional depth
@@ -99,7 +97,7 @@ User (Informed Consent: "Chat with AI + Therapist Supervision")
 
 ## III. Clinical Competencies: What the AI Learns
 
-### Phase 1: Foundational Skills (Deployment Year 1-2)
+### Phase 1: Foundational Skills 
 
 The AI learns to perform under therapist supervision:
 
@@ -137,13 +135,11 @@ The AI learns to perform under therapist supervision:
 #### D. Adaptive Session Planning & Pacing
 - Short-term issue management vs. long-term treatment planning
 - Recognizing when to deepen work vs. when to consolidate skills
-- Building therapeutic alliance across time
 - Flexibility when treatment isn't progressing
 
 ### Phase 2: Advanced Competencies (Post-Launch, Ongoing)
 
 - **Crisis Assessment & Response:** Suicidality, homicide risk, abuse, self-harm—with clear escalation to human clinician
-- **Therapeutic Relationship Repair:** Addressing ruptures, working with resistance, addressing transference
 - **Cultural Competency:** Adapting interventions for diverse cultural backgrounds, values, identities
 - **Treatment Termination:** Recognizing readiness for discharge, creating relapse prevention plans, fostering independence
 
@@ -336,12 +332,12 @@ User Input → AI Response Generation → Licensed Therapist Review
 
 ## VII. Development Roadmap & Timeline
 
-### Phase 1: Minimum Viable Product (MVP) - Dec 2025 to Q3 2026
+### Phase 1: Minimum Viable Product (MVP) 
 
 **Core Deliverables:**
 - Text-based AI therapy platform with therapist oversight interface
 - Real-time RLHF training pipeline (user session → therapist feedback → model update)
-- 1-3 disorders with trained model (depression + anxiety as primary targets)
+- 1-3 disorders with trained model 
 - Licensed therapist supervision system with clear protocols
 - Patient consent & disclosure framework
 - Beta deployment with 50-100 carefully-selected patients
@@ -352,27 +348,25 @@ User Input → AI Response Generation → Licensed Therapist Review
 - Software engineering team
 - Therapist volunteers for initial training data collection
 
-### Phase 2: Clinical Validation & Expansion (Q4 2026 to Q2 2027)
+### Phase 2: Clinical Validation & Expansion 
 
 **Deliverables:**
 - Expand to 5-6 disorders
 - Publish pilot efficacy data (outcomes, safety, engagement vs. improvement analysis)
 - Add audio capabilities
-- Implement wearable HRV integration (consumer-grade)
 - Begin formal clinical trials
 - Regulatory pathways initiated (CE marking, clinical validation documentation)
 
 **Funding:**
-- Venture capital targeting health tech/AI-for-good funds
+- Venture capital targeting health tech
 - Grant funding (EU health research, mental health innovation)
 
-### Phase 3: Clinical-Grade Implementation & Scale (2027+)
+### Phase 3: Clinical-Grade Implementation & Scale 
 
 **Deliverables:**
 - FDA/CE validation completed
 - Integration with healthcare systems
 - Multilingual deployment
-- Clinician-facing app with HRV dashboard
 - Peer-reviewed publications demonstrating efficacy
 - Training programs for therapists using the system
 
@@ -388,9 +382,9 @@ User Input → AI Response Generation → Licensed Therapist Review
 
 | Jurisdiction | Classification | Key Requirements | Timeline |
 |---|---|---|---|
-| **EU** | Medical Device Class II (provisional) | CE marking, clinical evidence of safety/efficacy, quality management | 12-18 months post-MVP |
-| **Poland** (Primary Market) | Health app with clinical oversight; potential medical device classification | Local health authority approval, Polish-language validation | 12 months |
-| **US** (Future) | FDA SaMD (Software as Medical Device) or clinical decision support | Substantial evidence of safety/efficacy, post-market surveillance plan | 24+ months |
+| **EU** | Medical Device Class II (provisional) | CE marking, clinical evidence of safety/efficacy, quality management | 
+| **Poland**  | Health app with clinical oversight; potential medical device classification | Local health authority approval, Polish-language validation | 
+| **US**  | FDA SaMD (Software as Medical Device) or clinical decision support | Substantial evidence of safety/efficacy, post-market surveillance plan | 
 
 **Key Regulatory Arguments in Eywa's Favor:**
 1. **Human-in-the-loop architecture reduces autonomous risk** → Lower classification than fully autonomous systems
@@ -411,8 +405,9 @@ User Input → AI Response Generation → Licensed Therapist Review
   - Independent monitoring plan (adverse events)
 
 **Collaboration Opportunity for Scientists:**
-- Eywa seeks experienced clinical researchers to lead ethics submissions and initial trials
+- Eywa seeks experienced clinical researchers to lead initial trials and ethics submissions 
 - Co-authorship opportunity on regulatory submissions and publications
+- Creating Clinical-AI Synchrony ensuring the product excels in real-world complexities
 
 ---
 
@@ -451,16 +446,12 @@ Eywa is **not a replacement for telemedicine**; it's a **complement:**
 
 ### We Are Seeking Partnership With:
 
-**Clinical Researchers (Like Marcin Rzadeczka):**
+**Clinical Researchers :**
 - **Role:** Co-design clinical protocols, oversee RLHF training process, validate model outputs
 - **Expertise Needed:** Psychotherapy, trauma/cPTSD, neurodiversity, comorbidity management
 - **Deliverables:** Co-authored protocols, ethics submissions, trial design, publications
 - **Timeline:** 12-month initial engagement, potential for longer-term collaboration
 
-**Neuroscientists & Psychophysiologists:**
-- **Focus:** HRV-to-behavior mapping, nervous system dynamics in therapy
-- **Role:** Validate physiological data integration, train AI on autonomic patterns
-- **Opportunities:** Novel research on nervous system response to AI vs. human therapists
 
 **AI/NLP Researchers:**
 - **Focus:** Fine-tuning LLMs for therapy, RLHF optimization, bias detection
@@ -480,7 +471,7 @@ Eywa is **not a replacement for telemedicine**; it's a **complement:**
 - Funding for collaborative studies (as available)
 - Co-authorship on publications
 - Involvement in regulatory submissions
-- Exposure through presentations & media
+
 
 **What We Seek from Partners:**
 - Clinical expertise and protocol design
@@ -509,7 +500,6 @@ Eywa is **not a replacement for telemedicine**; it's a **complement:**
 - ✅ Therapist observes and corrects AI's affect handling in real-time
 - ✅ Each corrected instance trains model: "This is what genuine emotional shift looks like"
 - ✅ Accumulation of corrected examples over sessions improves AI affect sensitivity
-- ✅ Audio + HRV physiological data provides non-linguistic emotional signals AI can learn
 
 ### Concern 3: "No Long-term Efficacy Data for Chatbots"
 **Research Finding:** Meta-analyses show short-term effects but no sustained long-term benefit[2]
@@ -552,10 +542,9 @@ Eywa is **not a replacement for telemedicine**; it's a **complement:**
 - Proof that supervised RLHF improves AI clinical competency
 
 ### Year 3-5: Regional Scale & Regulatory Approval
-- 5,000+ users across Poland/EU
+- 5,000+ users across EU/Poland/USA
 - CE marking obtained
 - Integration with health systems
-- Clinician-facing HRV dashboard operational
 - 3-5 peer-reviewed publications on efficacy and mechanisms
 
 ### Year 5+: Scaled Impact
@@ -641,11 +630,6 @@ Transform mental health care from **scarcity model** (therapist shortage, high c
 
 ## XIV. Financial & Sustainability Model
 
-### User Pricing (Planned)
-- **Baseline:** €10/month subscription (founder stated pricing)
-- **Premium:** €20/month with more AI session time
-- **Free tier:** Limited access for economically disadvantaged (funded by premium users)
-- **Insurance:** Integration for users with mental health coverage
 
 ### Revenue Model
 - Subscription fees from users
@@ -654,9 +638,9 @@ Transform mental health care from **scarcity model** (therapist shortage, high c
 - Grant funding (innovation/health research)
 
 ### Profitability Path
-- Year 1-2: Founder-financed (personal investment, learning phase)
-- Year 2-3: Venture funding targeting mission-driven investors
-- Year 3+: Revenue-positive (subscription + licensing)
+ Founder-financed (personal investment, learning phase)
+ Venture funding targeting mission-driven investors
+ Revenue-positive (subscription + licensing)
 
 ### Commitment
 **Clinical effectiveness prioritized over growth metrics:**
@@ -665,98 +649,12 @@ Transform mental health care from **scarcity model** (therapist shortage, high c
 - Therapist-supervised model limits scalability but ensures quality
 - Pricing keeps barrier to access low despite healthcare market pressures
 
----
 
-## XV. Call to Action: Collaboration Invitation
+### Future prospects:
+- Multimodal AI uses text, audio, video, and physiological data (HRV from consumer wearables) to detect and predict mental health disorders with 85-97% accuracy.​
 
-### To Dr. Marcin Rzadeczka & Clinical Researchers
+- Building a psychotherapist-facing app to leverage physiological data for adapting treatments based on patients' real-time nervous system states.​
 
-We are developing a novel clinical AI system that addresses fundamental limitations in current mental health technology. Your expertise in **[specific domain: trauma, neurodiversity, comorbidity, etc.]** is critical for:
-
-1. **Protocol Development:** Design clinical workflows that leverage AI benefits while maintaining therapeutic integrity
-2. **Training & Validation:** Oversee RLHF training process; ensure AI learns clinically-sound responses
-3. **Research:** Lead initial efficacy trials and publications establishing proof of concept
-4. **Ethical Framework:** Collaborate on ethics submissions, risk mitigation, regulatory strategy
-
-### Next Steps
-
-**If Interested in Collaboration:**
-
-1. **Initial Meeting:** 30-minute video call (late December 2025)
-   - Deep dive into Eywa architecture and your specific research interests
-   - Discuss potential collaboration scope and timeline
-   - Explore funding/publication opportunities
-
-2. **Detailed Protocol Development:** 2-3 collaborative sessions (January 2026)
-   - Co-design clinical protocols for your area of expertise
-   - Determine specific training data requirements
-   - Plan research validation approaches
-
-3. **Formal Collaboration Agreement:** (February 2026 onwards)
-   - Defined roles, responsibilities, timelines
-   - Publication and authorship framework
-   - Funding arrangements (if applicable)
-   - Long-term partnership potential
-
-### Contact Information
-**[Contact details would be inserted here by user]**
-
----
-
-## XVI. Appendices
-
-### Appendix A: Key Research References
-
-1. JMIR Mental Health (2025): "The Efficacy of Conversational AI in Rectifying Theory-of-Mind Biases" - Comparative evaluation of therapeutic vs. general-purpose chatbots in cognitive bias handling
-2. Nature npj Mental Health (2024): "Large Language Models Could Change the Future of Behavioral Healthcare" - Roadmap for responsible clinical LLM development with emphasis on human-in-the-loop integration
-3. APA Advisory on AI Chatbots in Mental Health - Ethical guidelines and limitations of current applications
-
-### Appendix B: Regulatory Landscape Summary
-
-**CE Marking (EU - Eywa's Primary Path):**
-- Class II Medical Device (likely classification)
-- Requires clinical evidence and quality management system
-- Estimated 12-18 month timeline post-MVP
-
-**Polish Health Authority:**
-- Digital health app regulations evolving
-- Clinical oversight requirement aligns with existing telemedicine frameworks
-- Potential for accelerated approval pathway given human supervision
-
-**FDA (US - Future Consideration):**
-- SaMD (Software as Medical Device) classification likely
-- Substantial equivalence pathway possible if comparing to approved telemedicine supervision models
-- 24+ month timeline typical
-
-### Appendix C: Informed Consent Template (Outline)
-
-**[Full consent document would be developed with ethics expert involvement]**
-
-Key elements:
-- Clear explanation: "AI is not a therapist; human is supervisor"
-- Your data: How transcripts are used, stored, protected
-- Risks: Limitations of AI, scenarios requiring human intervention
-- Benefits: Access, affordability, learning opportunity
-- Alternatives: Traditional therapy options
-- Right to withdraw at any time
-- Compensation for data contribution (if offered)
-
-### Appendix D: Therapist Supervision Protocol (Outline)
-
-**Session Structure:**
-1. Pre-session: Therapist reviews case, sets treatment goals
-2. Initiation: Patient connects; therapist observes (AI does not generate response until reviewed)
-3. Real-time: Patient input → AI generates response → Therapist reviews (30-60 sec) → Approves/modifies/takes over
-4. Post-session: Therapist provides feedback to AI system; documents session; plans next week
-
-**Quality Checkpoints:**
-- Adherence to evidence-based approach
-- Appropriate affect/cognitive integration
-- Safety assessment (risk flags)
-- Clinical utility (progress toward goals)
-- Therapeutic alliance quality
-
-### Appendix E: HRV Data Integration Strategy (Outline)
 
 **Consumer-Grade Wearables:**
 - Smartwatches, rings, chest straps (Oura, Apple Watch, Garmin, Polar)
@@ -781,15 +679,3 @@ Eywa represents a novel approach to AI-assisted mental health care that centers 
 
 This specification is offered to potential scientific collaborators as a detailed articulation of our vision, current challenges, and opportunities for partnership. We welcome rigorous critique, alternative perspectives, and expertise-driven collaboration to refine and validate this approach.
 
----
-
-**Document Version:** 1.0  
-**Last Updated:** November 30, 2025  
-**Next Review:** February 28, 2026  
-
-**For questions or collaboration inquiries:**  
-[Contact information to be inserted by user]
-
----
-
-*This specification reflects the core vision while remaining open to refinement based on scientific collaboration, regulatory feedback, and clinical validation.*
