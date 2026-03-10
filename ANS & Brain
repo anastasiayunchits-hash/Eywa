@@ -1,8 +1,8 @@
-```mermaid
+```mermaid 
 graph TD
     A[Traits / Diagnoses<br/>(ADHD, ASD, MDD, trauma, etc.)] --> B[Cortical–Limbic Control<br/>(attention, appraisal, reward)]
     B --> C[Central Autonomic Network / ANS Regulation<br/>(sympathetic, ventral & dorsal vagal)]
     C --> D[Moment-to-Moment Arousal State<br/>(hyperarousal, shutdown, mixed)]
     D --> E[Subjective Experience<br/>(numbness, joylessness, fatigue, detachment, etc.)]
-    A -.-> E
+    A --> E
 ``` 
